@@ -3,8 +3,8 @@ package com.ebbilogue.authservice.controller;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +21,7 @@ import com.ebbilogue.authservice.models.ERole;
 import com.ebbilogue.authservice.models.Role;
 import com.ebbilogue.authservice.models.User;
 import com.ebbilogue.authservice.payload.request.LoginRequest;
+import com.ebbilogue.authservice.payload.request.ResetPasswordRequest;
 import com.ebbilogue.authservice.payload.request.SignupRequest;
 import com.ebbilogue.authservice.payload.response.JwtResponse;
 import com.ebbilogue.authservice.payload.response.MessageResponse;
@@ -33,6 +34,15 @@ import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import com.ebbilogue.authservice.services.EmailService;
+import com.ebbilogue.authservice.utils.VerificationCodeUtil;
+
+import jakarta.transaction.Transactional;
+
+import org.springframework.http.HttpStatus;
+
+import com.ebbilogue.authservice.payload.request.ForgotPasswordRequest;
 
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -52,7 +62,13 @@ public class AuthController {
     PasswordEncoder encoder; 
 
     @Autowired
+    private EmailService emailService; 
+
+    @Autowired
     JwtUtils jwtUtils; 
+
+    @Autowired
+    private VerificationCodeUtil verificationCodeUtil;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) { 
@@ -132,5 +148,53 @@ public class AuthController {
         userRepository.save(user); 
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!")); 
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        try {
+            Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
+            
+            if (!userOptional.isEmpty()) {
+                // 生成验证码
+                String code = verificationCodeUtil.generateCode();
+                // 保存验证码到Redis
+                verificationCodeUtil.saveCode(request.getEmail(), code);
+                
+                // 发送验证码邮件
+                emailService.sendPasswordResetEmail(request.getEmail(), code, userOptional.get().getUsername());
+            }            
+            return ResponseEntity.ok(new MessageResponse("Validation vode has been sent to your email"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new MessageResponse("Failed to process send validation code request"));
+        }
+    }
+    
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        try {
+            Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
+            if (userOptional.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponse("No user found for the email"));
+            }
+            
+            // 验证验证码
+            if (!verificationCodeUtil.verifyCode(request.getEmail(), request.getCode())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new MessageResponse("Invalid or expired validation code"));
+            }
+            
+            // 更新密码
+            User user = userOptional.get();
+            user.setPassword(encoder.encode(request.getNewPassword()));
+            userRepository.save(user);
+            
+            return ResponseEntity.ok(new MessageResponse("Password reset successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new MessageResponse("Failed to reset password: " + e.getMessage()));
+        }
     }
 }
