@@ -22,12 +22,12 @@ public class UserRepositoryTests {
     @Test
     public void shouldFindUserByUsername() {
         // 创建测试用户
-        User user = new User("testuser", "test@test.com", "password123");
+        User user = new User("testuser111", "test111@test.com", "password123");
         entityManager.persist(user);
         entityManager.flush();
 
         // 测试查找功能
-        User found = userRepository.findByUsername("testuser").orElse(null);
+        User found = userRepository.findByUsername("testuser111").orElse(null);
         assertThat(found).isNotNull();
         assertThat(found.getUsername()).isEqualTo(user.getUsername());
     }
@@ -35,12 +35,12 @@ public class UserRepositoryTests {
     @Test
     public void shouldCheckUsernameExists() {
         // 创建测试用户
-        User user = new User("testuser", "test@test.com", "password123");
+        User user = new User("testuser111", "test111@test.com", "password123");
         entityManager.persist(user);
         entityManager.flush();
 
         // 测试用户名存在检查
-        boolean exists = userRepository.existsByUsername("testuser");
+        boolean exists = userRepository.existsByUsername("testuser111");
         assertThat(exists).isTrue();
     }
 }
