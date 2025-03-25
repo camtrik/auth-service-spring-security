@@ -22,6 +22,7 @@ public class User {
 
     @NotBlank
     @Size(max = 20)
+    @Column(columnDefinition = "TEXT")
     private String username;
 
     @NotBlank

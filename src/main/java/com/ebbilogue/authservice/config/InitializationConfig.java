@@ -28,7 +28,7 @@ public class InitializationConfig {
     private RoleRepository roleRepository; 
 
     @Autowired
-    private PasswordEncoder passwordEncoder; 
+    private PasswordEncoder encoder; 
 
     @Value("${app.admin.username}")
     private String adminUsername; 
@@ -39,6 +39,7 @@ public class InitializationConfig {
     @Value("${app.admin.password}")
     private String adminPassword; 
     
+    
     @EventListener(ApplicationReadyEvent.class)
     public void initializeAdmin() { 
         for (ERole role : ERole.values()) {
@@ -46,12 +47,12 @@ public class InitializationConfig {
                 roleRepository.save(new Role(role));
             }
         }
-
+        
         if (!userRepository.existsByUsername(adminUsername)) { 
             User adminUser = new User( 
                 adminUsername, 
                 adminEmail, 
-                passwordEncoder.encode(adminPassword)
+                encoder.encode(adminPassword)
             ); 
 
             Set<Role> roles = new HashSet<>(); 

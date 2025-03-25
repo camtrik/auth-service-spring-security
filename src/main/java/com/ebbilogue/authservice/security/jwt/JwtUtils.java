@@ -1,13 +1,10 @@
 package com.ebbilogue.authservice.security.jwt;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.KeysetScrollPosition;
-import org.springframework.security.access.method.P;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import com.ebbilogue.authservice.security.services.UserDetailsImpl;
-import com.ebbilogue.authservice.security.services.UserDetailsServiceImpl;
 
 import java.security.Key;
 import java.util.Date;
