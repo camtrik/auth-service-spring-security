@@ -94,7 +94,8 @@ public class AuthController {
             userDetails.getId(), 
             userDetails.getUsername(), 
             userDetails.getEmail(), 
-            roles));
+            roles,
+            userDetails.getAvatarUrl()));
     }
     
     @PostMapping("/signup")
@@ -112,7 +113,8 @@ public class AuthController {
         // 创建新用户
         User user = new User(signupRequest.getUsername(), 
                             signupRequest.getEmail(), 
-                            encoder.encode(signupRequest.getPassword()));
+                            encoder.encode(signupRequest.getPassword()),
+                            signupRequest.getAvatarUrl());
         
         Set<Role> roles = new HashSet<>(); 
         

@@ -38,7 +38,9 @@ public class InitializationConfig {
 
     @Value("${app.admin.password}")
     private String adminPassword; 
-    
+
+    @Value("${app.admin.avatarUrl}")
+    private String adminAvatarUrl;
     
     @EventListener(ApplicationReadyEvent.class)
     public void initializeAdmin() { 
@@ -52,7 +54,8 @@ public class InitializationConfig {
             User adminUser = new User( 
                 adminUsername, 
                 adminEmail, 
-                encoder.encode(adminPassword)
+                encoder.encode(adminPassword), 
+                adminAvatarUrl
             ); 
 
             Set<Role> roles = new HashSet<>(); 

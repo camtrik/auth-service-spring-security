@@ -22,7 +22,7 @@ public class UserRepositoryTests {
     @Test
     public void shouldFindUserByUsername() {
         // 创建测试用户
-        User user = new User("testuser111", "test111@test.com", "password123");
+        User user = new User("testuser111", "test111@test.com", "password123", "");
         entityManager.persist(user);
         entityManager.flush();
 
@@ -35,7 +35,7 @@ public class UserRepositoryTests {
     @Test
     public void shouldCheckUsernameExists() {
         // 创建测试用户
-        User user = new User("testuser111", "test111@test.com", "password123");
+        User user = new User("testuser111", "test111@test.com", "password123", "");
         entityManager.persist(user);
         entityManager.flush();
 

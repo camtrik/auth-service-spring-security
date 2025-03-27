@@ -20,7 +20,10 @@ public class SignupRequest {
 
     @NotBlank 
     @Size(min = 6, max = 40)
-    private String password; 
+    private String password;
+    
+    @Size(max = 255)
+    private String avatarUrl;
 
     public String getUsername() {
         return username; 
@@ -48,5 +51,13 @@ public class SignupRequest {
 
     public Set<String> getRole() {
         return this.role; 
+    }
+
+    public String getAvatarUrl() {
+        return this.avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 }
