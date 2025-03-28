@@ -20,6 +20,14 @@ public class JwtResponse {
         this.avatarUrl = avatarUrl;
     }
 
+    public JwtResponse(String accessToken, Long id, String username, String email, String avatarUrl) {
+        this.token = accessToken; 
+        this.id = id; 
+        this.username = username; 
+        this.email = email; 
+        this.avatarUrl = avatarUrl;
+    }
+
     public String getAccessToken() {
         return token;
     }
