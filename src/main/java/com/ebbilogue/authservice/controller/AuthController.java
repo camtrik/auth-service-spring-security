@@ -139,10 +139,13 @@ public class AuthController {
                 String code = verificationCodeUtil.generateCode();
                 // 保存验证码到Redis
                 verificationCodeUtil.saveCode(request.getEmail(), code);
-                
+                 
                 // 发送验证码邮件
                 emailService.sendPasswordResetEmail(request.getEmail(), code, userOptional.get().getUsername());
-            }            
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponse("No user found for the email"));
+            }
             return ResponseEntity.ok(new MessageResponse("Validation vode has been sent to your email"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
